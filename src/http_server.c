@@ -2,7 +2,7 @@
 * @Author: karlosiric
 * @Date:   2025-06-26 14:39:26
 * @Last Modified by:   karlosiric
-* @Last Modified time: 2025-06-27 21:08:21
+* @Last Modified time: 2025-06-27 21:35:09
 */
 
 #include "../include/http_server.h"
@@ -40,7 +40,9 @@ int start_http_server(void) {
     }
 
     printf("HTTP server started on port: %d\n", HTTP_PORT);
-
+    char *buffer;
+    ssize_t client_message;
+    ssize_t bytes_sent;
     while(1) {
         client_fd = accept(socket_fd, (struct sockaddr *)&client_address, &client_addr_len);
         if (client_fd == -1) {
@@ -48,16 +50,33 @@ int start_http_server(void) {
             close(socket_fd);
             return (-4);
         }
+        buffer = (char *)malloc(MAX_BUFFER_SIZE * sizeof(char));
+        client_message = recv(client_fd, buffer,  MAX_BUFFER_SIZE * sizeof(char), 0);
+        if (client_message <= 0) {
+            printf("Failed to read clien't message, received: %zu bytes of data!", client_message);
+            free(buffer);
+            close(client_fd);
+            continue;
+        }
+        buffer[client_message] = '\0';  
+        char *server_response = "HTTP/1.0 200 OK\r\n\r\nHello World!";
+        bytes_sent = send(client_fd, server_response, strlen(server_response), 0);
+        if (bytes_sent < 0) {
+            printf("Failed to send the response: %s\n", strerror(errno));
+            close(client_fd);
+            free(buffer); 
+            continue;
+        } else if ((size_t)bytes_sent < strlen(server_response)) {
+            printf("Warning: Only sent %zu out of %zu data bytes\n", bytes_sent, strlen(server_response));
 
-        // Now we need to read what the client has sent us
-
-
-
+        } else {
+            printf("Successfully sent all of the %zu bytes of data!", bytes_sent);
+            close(client_fd);
+            free(buffer);
+        }
     }
 
-
-
-
+    printf("Server closing down ... \n");
 
     return (0);
 }

@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -Wpedantic -std=c99 -O2 -g -Iinclude
-LDFLAGS = -lcurl -lcjson
+LDFLAGS = -lcurl -lcjson 
 
 SRCDIR = src
 INCDIR = include
@@ -27,5 +27,9 @@ clean:
 test: $(OBJDIR)/weather_api.o
 	@mkdir -p bin
 	$(CC) $(CFLAGS) test_weather.c $(OBJDIR)/weather_api.o -o bin/test_weather $(LDFLAGS)
+
+test_http: $(OBJDIR)/http_server.o
+	@mkdir -p bin
+	$(CC) $(CFLAGS) $(SRCDIR)/test_http_server.c $(OBJDIR)/http_server.o -o bin/test_http_server $(LDFLAGS)
 
 .PHONY: all clean test
