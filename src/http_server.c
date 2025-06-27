@@ -2,14 +2,14 @@
 * @Author: karlosiric
 * @Date:   2025-06-26 14:39:26
 * @Last Modified by:   karlosiric
-* @Last Modified time: 2025-06-27 20:43:29
+* @Last Modified time: 2025-06-27 21:08:21
 */
 
 #include "../include/http_server.h"
 
 int start_http_server(void) {
 
-    int socket_fd, bind_result;
+    int socket_fd, bind_result, client_fd;
     socket_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (socket_fd == -1) {
         printf("Error creating socket: %s\n", strerror(errno));
@@ -17,6 +17,9 @@ int start_http_server(void) {
     }
 
     struct sockaddr_in server_address;
+    struct sockaddr_in client_address;
+    socklen_t client_addr_len = sizeof(client_address);
+
     memset(&server_address, 0, sizeof(server_address));
     server_address.sin_family = AF_INET;                     // for internet protocol version 4
     server_address.sin_port = htons(HTTP_PORT);              // this is to convert the port number to network byte order (Big Endian network byte order).
@@ -29,6 +32,29 @@ int start_http_server(void) {
         close(socket_fd);
         return (-2);
     }
+
+    if (listen(socket_fd, MAX_CONNECTIONS) == -1) {
+        printf("Error listening on the socket: %s\n", strerror(errno));
+        close(socket_fd);
+        return (-3);
+    }
+
+    printf("HTTP server started on port: %d\n", HTTP_PORT);
+
+    while(1) {
+        client_fd = accept(socket_fd, (struct sockaddr *)&client_address, &client_addr_len);
+        if (client_fd == -1) {
+            printf("Error accepting connections on the socket: %s\n", strerror(errno));
+            close(socket_fd);
+            return (-4);
+        }
+
+        // Now we need to read what the client has sent us
+
+
+
+    }
+
 
 
 
