@@ -69,6 +69,8 @@ typedef struct {
 
     s_current_weather current_weather;
     s_current_weather_units current_weather_units;
+    s_hourly_units hourly_units;
+    s_hourly hourly;
 
 } s_weather;
 
