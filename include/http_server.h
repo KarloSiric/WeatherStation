@@ -9,8 +9,13 @@
 #include <sys/types.h>
 #include <netinet/tcp.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
+
+#define HTTP_PORT           8080
+#define MAX_CONNECTIONS     10
 
 
+void start_http_server(void);
 
 
 
