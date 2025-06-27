@@ -2,7 +2,7 @@
 * @Author: karlosiric
 * @Date:   2025-06-26 14:39:26
 * @Last Modified by:   karlosiric
-* @Last Modified time: 2025-06-27 13:51:25
+* @Last Modified time: 2025-06-27 13:54:25
 */
 
 #include "../include/weather.h"
@@ -135,8 +135,8 @@ e_weather_error parse_weather_json(const char *json_data, s_weather *weather_dat
     weather_data->current_weather.is_day = is_day->valueint;
     weather_data->current_weather.weathercode = weather_code->valueint;
     weather_data->current_weather.temperature = temp->valueint;
-    weather_data->current_weather.windspeed = windspeed->valueint;
-    weather_data->current_weather.winddirection = winddirection->valueint;
+    weather_data->current_weather.windspeed = windspeed->valuedouble;
+    weather_data->current_weather.winddirection = winddirection->valuedouble;
 
     cJSON *current_weather_units = cJSON_GetObjectItem(root, "current_weather_units");
     if (!cJSON_IsObject(current_weather_units)) {
