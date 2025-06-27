@@ -61,19 +61,6 @@ typedef struct {
     double windspeed_10m[HOURLY_DATA_POINTS];
 } s_hourly;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 typedef struct {
     double latitude;
     double longitude;
@@ -85,6 +72,14 @@ typedef struct {
 
 } s_weather;
 
+typedef struct {
+    char *data;
+    size_t size;
+} s_response_data;
+
+
+/* Function prototypes */
+e_weather_error fetch_weather_data(const char *url, char **response);
 
 
 #endif
