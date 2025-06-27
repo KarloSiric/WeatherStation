@@ -80,6 +80,6 @@ typedef struct {
 
 /* Function prototypes */
 e_weather_error fetch_weather_data(const char *url, char **response);
-
+e_weather_error parse_weather_json(const char *json_data, s_weather *weather_data);
 
 #endif

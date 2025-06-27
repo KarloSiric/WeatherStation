@@ -2,13 +2,13 @@
 * @Author: karlosiric
 * @Date:   2025-06-26 14:39:26
 * @Last Modified by:   karlosiric
-* @Last Modified time: 2025-06-27 09:58:47
+* @Last Modified time: 2025-06-27 11:02:48
 */
 
 #include "../include/weather.h"
 #include <curl/curl.h>
 #include <errno.h>
-
+#include <cjson/cJSON.h>
 
 size_t write_data(void *buffer, size_t size, size_t nmemb, void *usrptr) {
 
@@ -86,3 +86,22 @@ e_weather_error fetch_weather_data(const char *url, char **response) {
     free(response_struct);
     return E_WEATHER_SUCCESS;
 }
+
+e_weather_error parse_weather_json(const char *json_data, s_weather *weather_data) {
+    
+    cJSON *root = cJSON_Parse(json_data);
+    if (root == NULL) {
+        fprintf(stderr, "Failed to parse %s JSON data: %s\n", __func__, cJSON_GetErrorPtr());
+        return E_WEATHER_INVALID_JSON;
+    }
+
+    cJSON *latitude = cJSON_GetObjectItem(root, "latitude");
+    cJSON *longitude = cJSON_GetObjectItem(root, "longitude");
+    
+
+
+
+
+}
+
+
