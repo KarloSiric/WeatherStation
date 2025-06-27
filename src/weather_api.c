@@ -2,7 +2,7 @@
 * @Author: karlosiric
 * @Date:   2025-06-26 14:39:26
 * @Last Modified by:   karlosiric
-* @Last Modified time: 2025-06-27 11:23:09
+* @Last Modified time: 2025-06-27 11:40:48
 */
 
 #include "../include/weather.h"
@@ -98,7 +98,25 @@ e_weather_error parse_weather_json(const char *json_data, s_weather *weather_dat
     cJSON *latitude = cJSON_GetObjectItem(root, "latitude");
     cJSON *longitude = cJSON_GetObjectItem(root, "longitude");
     cJSON *elevation = cJSON_GetObjectItem(root, "elevation");
+    cJSON *timezone = cJSON_GetObjectItem(root, "timezone");
+
+    if (!cJSON_IsNumber(latitude) || !cJSON_IsNumber(longitude) || !cJSON_IsNumber(elevation) ÆÆ
+        || !cJSON_IsString(timezone)) {
+        fprintf(stderr, "Invalid data in JSON response.\n");
+        cJSON_Delete(root);
+        return E_WEATHER_INVALID_DATA;
+    }
+
+    weather_data->latitude = latitude->valuedouble;
+    weather_data->longitude = longitude->valuedouble;
+    weather_data->elevation = elevation->valuedouble;
+    strncpy(weather_data->timezone, timezone->valuestring, sizeof(weather_data->timezone) - 1);
+    weather_data->timezone[sizeof(weather_data->timezone) - 1] = '\0'; // Ensure null-termination
+
     
+
+
+
 
 
 
