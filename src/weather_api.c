@@ -2,7 +2,7 @@
 * @Author: karlosiric
 * @Date:   2025-06-26 14:39:26
 * @Last Modified by:   karlosiric
-* @Last Modified time: 2025-06-27 11:02:48
+* @Last Modified time: 2025-06-27 11:23:09
 */
 
 #include "../include/weather.h"
@@ -97,8 +97,8 @@ e_weather_error parse_weather_json(const char *json_data, s_weather *weather_dat
 
     cJSON *latitude = cJSON_GetObjectItem(root, "latitude");
     cJSON *longitude = cJSON_GetObjectItem(root, "longitude");
+    cJSON *elevation = cJSON_GetObjectItem(root, "elevation");
     
-
 
 
 
