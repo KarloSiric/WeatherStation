@@ -3,6 +3,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
 #include <string.h>
 #include <errno.h>
 #include <sys/socket.h>
@@ -15,11 +16,8 @@
 #define MAX_CONNECTIONS     10
 
 
-void start_http_server(void);
 
-
-
-
+int start_http_server(void);
 
 
 #endif
