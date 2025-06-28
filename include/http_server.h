@@ -12,12 +12,10 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-
 #define HTTP_PORT            8080
 #define MAX_CONNECTIONS      10
 #define MAX_BUFFER_SIZE      8192
 
 int start_http_server(void);
-
 
 #endif

@@ -2,10 +2,12 @@
 * @Author: karlosiric
 * @Date:   2025-06-26 14:39:26
 * @Last Modified by:   karlosiric
-* @Last Modified time: 2025-06-27 21:35:09
+* @Last Modified time: 2025-06-28 19:38:40
 */
 
+
 #include "../include/http_server.h"
+#include <stdio.h>
 
 int start_http_server(void) {
 
@@ -40,6 +42,7 @@ int start_http_server(void) {
     }
 
     printf("HTTP server started on port: %d\n", HTTP_PORT);
+    
     char *buffer;
     ssize_t client_message;
     ssize_t bytes_sent;
