@@ -16,6 +16,8 @@
 #define MAX_CONNECTIONS      10
 #define MAX_BUFFER_SIZE      8192
 
+extern volatile int keep_running;
+
 int start_http_server(void);
 
 #endif

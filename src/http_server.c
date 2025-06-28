@@ -2,12 +2,14 @@
 * @Author: karlosiric
 * @Date:   2025-06-26 14:39:26
 * @Last Modified by:   karlosiric
-* @Last Modified time: 2025-06-28 19:38:40
+* @Last Modified time: 2025-06-28 21:56:18
 */
 
 
 #include "../include/http_server.h"
+#include <signal.h>
 #include <stdio.h>
+
 
 int start_http_server(void) {
 
@@ -43,10 +45,10 @@ int start_http_server(void) {
 
     printf("HTTP server started on port: %d\n", HTTP_PORT);
     
-    char *buffer;
     ssize_t client_message;
     ssize_t bytes_sent;
-    while(1) {
+    char *buffer;
+    while(keep_running) {
         client_fd = accept(socket_fd, (struct sockaddr *)&client_address, &client_addr_len);
         if (client_fd == -1) {
             printf("Error accepting connections on the socket: %s\n", strerror(errno));
