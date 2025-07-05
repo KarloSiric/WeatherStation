@@ -2,7 +2,7 @@
 * @Author: karlosiric
 * @Date:   2025-06-26 14:39:26
 * @Last Modified by:   karlosiric
-* @Last Modified time: 2025-06-28 21:56:18
+* @Last Modified time: 2025-06-28 22:08:13
 */
 
 
@@ -65,6 +65,7 @@ int start_http_server(void) {
         }
         buffer[client_message] = '\0';  
         char *server_response = "HTTP/1.0 200 OK\r\n\r\nHello World!";
+        printf("=== Received HTTP Request ===\n%s\n=== End Request ===\n", buffer);
         bytes_sent = send(client_fd, server_response, strlen(server_response), 0);
         if (bytes_sent < 0) {
             printf("Failed to send the response: %s\n", strerror(errno));
