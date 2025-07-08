@@ -2,14 +2,13 @@
 * @Author: karlosiric
 * @Date:   2025-06-26 14:39:26
 * @Last Modified by:   karlosiric
-* @Last Modified time: 2025-06-28 22:08:13
+* @Last Modified time: 2025-07-08 12:47:59
 */
 
 
 #include "../include/http_server.h"
 #include <signal.h>
 #include <stdio.h>
-
 
 int start_http_server(void) {
 
@@ -86,3 +85,20 @@ int start_http_server(void) {
 
     return (0);
 }
+
+int parse_http_request(const char *request, char *method, char *path) {
+    if (request == NULL || *request == '\0') {
+        fprintf(stderr, "Client HTTP request message is empty, nothing to parse!\n");
+        return (-1);
+    }
+
+    
+
+
+
+
+
+
+}
+
+

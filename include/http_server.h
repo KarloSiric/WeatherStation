@@ -19,5 +19,6 @@
 extern volatile int keep_running;
 
 int start_http_server(void);
+int parse_http_request(const char *request, char *method, char *path);
 
 #endif
