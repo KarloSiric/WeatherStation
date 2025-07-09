@@ -1,1 +1,4 @@
-*.txt
+.env
+config.txt
+*.log
+ServerLogger.log
