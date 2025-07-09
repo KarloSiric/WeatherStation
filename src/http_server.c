@@ -2,7 +2,7 @@
 * @Author: karlosiric
 * @Date:   2025-06-26 14:39:26
 * @Last Modified by:   karlosiric
-* @Last Modified time: 2025-07-09 14:45:13
+* @Last Modified time: 2025-07-09 14:45:39
 */
 
 
@@ -87,7 +87,6 @@ int start_http_server(void) {
                 server_response = "HTTP/1.0 404 Not Found\r\n\r\n404 - Page Not Found!";
                 break;
         }
- 
             
         bytes_sent = send(client_fd, server_response, strlen(server_response), 0);
         if (bytes_sent < 0) {
