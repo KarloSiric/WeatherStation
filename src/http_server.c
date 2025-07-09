@@ -2,7 +2,7 @@
 * @Author: karlosiric
 * @Date:   2025-06-26 14:39:26
 * @Last Modified by:   karlosiric
-* @Last Modified time: 2025-07-09 14:45:39
+* @Last Modified time: 2025-07-09 14:57:22
 */
 
 
@@ -70,6 +70,7 @@ int start_http_server(void) {
         char path[256];
         char city_name[256];
         int parse_result = parse_http_request(buffer, method, path);
+        int query_result = parse_query_request(path, city_name);
 
         e_routing routing_type = determine_route(path);
 
@@ -87,7 +88,10 @@ int start_http_server(void) {
                 server_response = "HTTP/1.0 404 Not Found\r\n\r\n404 - Page Not Found!";
                 break;
         }
-            
+        if (query_result == 0) {
+            printf("Parsed city from the URL: '%s'\n", city_name);
+        }
+
         bytes_sent = send(client_fd, server_response, strlen(server_response), 0);
         if (bytes_sent < 0) {
             printf("Failed to send the response: %s\n", strerror(errno));
