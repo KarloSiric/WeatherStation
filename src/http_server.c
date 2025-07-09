@@ -2,13 +2,14 @@
 * @Author: karlosiric
 * @Date:   2025-06-26 14:39:26
 * @Last Modified by:   karlosiric
-* @Last Modified time: 2025-07-08 13:40:29
+* @Last Modified time: 2025-07-09 14:45:13
 */
 
 
 #include "../include/http_server.h"
 #include <signal.h>
 #include <stdio.h>
+#include <string.h>
 
 int start_http_server(void) {
 
@@ -63,19 +64,31 @@ int start_http_server(void) {
             continue;
         }
         buffer[client_message] = '\0';  
-        char *server_response = "HTTP/1.0 200 OK\r\n\r\nHello World!";
+        char *server_response;
         printf("=== Received HTTP Request ===\n%s\n=== End Request ===\n", buffer);
         char method[16];
         char path[256];
+        char city_name[256];
         int parse_result = parse_http_request(buffer, method, path);
 
-        if (parse_result == 0) {
-            printf("Parsed Method: %s\n", method);
-            printf("Parsed Path: %s\n", path);
-        } else {
-            printf("Error parsing request\n");
-        }
+        e_routing routing_type = determine_route(path);
 
+        switch(routing_type) {
+            case ROUTE_HOME:
+                server_response = "HTTP/1.0 200 OK\r\n\r\nWelcome to the Weather Station!";
+                break;
+            case ROUTE_API_WEATHER:
+                server_response = "HTTP/1.0 200 OK\r\n\r\nAPI Endpoint Working!";
+                break;
+            case ROUTE_WEATHER:
+                server_response = "HTTP/1.0 200 OK\r\n\r\nWeather Station Page!";
+                break;
+            default:
+                server_response = "HTTP/1.0 404 Not Found\r\n\r\n404 - Page Not Found!";
+                break;
+        }
+ 
+            
         bytes_sent = send(client_fd, server_response, strlen(server_response), 0);
         if (bytes_sent < 0) {
             printf("Failed to send the response: %s\n", strerror(errno));
@@ -139,9 +152,67 @@ int parse_http_request(const char *request, char *method, char *path) {
         path[j - first_space - 1] = request[j];
     }
     path[second_space - first_space - 1] = '\0';
-
         
     return 0;
 }
 
+int parse_query_request(char *path, char *city_name) {
+    if (path == NULL) {
+        fprintf(stderr, "Error the path pointer is NULL!");
+        return (-1);
+    }
 
+    int question_mark_index = -1;
+    char *city_buffer;
+    city_buffer = (char *)malloc(256 * sizeof(char));
+
+    for (int i = 0; path[i] != '\0'; i++) {
+        if (path[i] == '?') {
+            question_mark_index = i;
+            break;
+        }
+    }
+
+    int buffer_index = 0;
+    for (int j = question_mark_index + 1; j < (int)strlen(path); j++) {
+        city_buffer[j - question_mark_index - 1] = path[j];   
+        buffer_index++;
+    }
+
+    city_buffer[buffer_index] = '\0';
+    
+
+    int equals_index = -1;
+
+    for (int i = 0; *city_buffer != '\0'; i++) {
+        if (city_buffer[i] == '=') {
+            equals_index = i;
+            break;
+        }
+    }
+    int city_index = 0;
+    for (int k = equals_index + 1; k < (int) strlen(city_buffer); k++) {
+        city_name[k - equals_index - 1] = city_buffer[k];
+        city_index++;
+    }
+    city_name[city_index] = '\0';
+
+    free(city_buffer);
+    return (0);
+}
+
+e_routing determine_route(const char *path) {
+    if (strcmp(path, "/") == 0) {
+        return ROUTE_HOME;
+    } 
+
+    if (strncmp(path, "/api/weather", 12) == 0) {
+        return ROUTE_API_WEATHER;
+    }
+
+    if (strcmp(path, "/weather") == 0) {
+        return ROUTE_WEATHER;
+    }
+
+    return ROUTE_NOT_FOUND;
+}

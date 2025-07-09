@@ -18,7 +18,16 @@
 
 extern volatile int keep_running;
 
+typedef enum {
+    ROUTE_HOME,
+    ROUTE_WEATHER,
+    ROUTE_API_WEATHER,
+    ROUTE_NOT_FOUND
+} e_routing;
+
+
 int start_http_server(void);
 int parse_http_request(const char *request, char *method, char *path);
-
+int parse_query_request(char *path, char *city_name);
+e_routing determine_route(const char *path);
 #endif
