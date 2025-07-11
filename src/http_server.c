@@ -2,11 +2,12 @@
 * @Author: karlosiric
 * @Date:   2025-06-26 14:39:26
 * @Last Modified by:   karlosiric
-* @Last Modified time: 2025-07-11 13:44:47
+* @Last Modified time: 2025-07-11 15:46:48
 */
 
 
 #include "../include/http_server.h"
+#include "../include/logger.h"
 #include <signal.h>
 #include <stdio.h>
 #include <string.h>
@@ -199,12 +200,14 @@ int parse_query_request(char *path, s_query_params *params) {
             char *value = equals_pos + 1;
            
             // DEBUG INFO
-            printf("Key: %s | Value: %s\n", key, value);
+            printf("Key: %s | Value (before decoding hex characters): %s\n", key, value);
 
             // TODO: Need to now implement checking for each key and value
             if (strcmp(key, "city") == 0 || strcmp(key, "name") == 0 || strcmp(key, "location") == 0) {
                 // We store that as the city
-                strncpy(params->city, value, sizeof(params->city) - 1);
+                char decoded_city[256];
+                url_decoding(decoded_city, value);
+                strncpy(params->city, decoded_city, sizeof(params->city) - 1);
                 params->city[sizeof(params->city) - 1] = '\0';
                 params->has_city = 1;
             } 
@@ -248,4 +251,32 @@ e_routing determine_route(const char *path) {
     }   
 
     return ROUTE_NOT_FOUND;
+}
+
+int url_decoding(char *dst, const char *src) {
+
+    char *p = dst;
+    while(*src) {
+        int hex_value;
+        if (*src == '%' && src[1] && src[2]) {
+            int hex_value;
+            if(sscanf(src + 1, "%2x", &hex_value) == 1) {
+                *p++=(char)hex_value;
+                src+=3;
+            } else {
+                *p = *src;
+                p++, src++;
+            }
+        } else if (*src == '+') {
+            *p = ' ';
+            src++;
+        } else {
+            *p = *src;
+            p++, src++;
+        }
+    }
+
+    *p = '\0';
+
+    return (0);
 }

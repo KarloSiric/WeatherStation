@@ -36,4 +36,6 @@ int start_http_server(void);
 int parse_http_request(const char *request, char *method, char *path);
 int parse_query_request(char *path, s_query_params *params);
 e_routing determine_route(const char *path);
+int url_decoding(char *dst, const char *src);
+
 #endif
