@@ -2,7 +2,7 @@
 * @Author: karlosiric
 * @Date:   2025-06-26 14:39:26
 * @Last Modified by:   karlosiric
-* @Last Modified time: 2025-07-09 14:57:22
+* @Last Modified time: 2025-07-11 11:35:58
 */
 
 
@@ -159,49 +159,51 @@ int parse_http_request(const char *request, char *method, char *path) {
     return 0;
 }
 
-int parse_query_request(char *path, char *city_name) {
-    if (path == NULL) {
-        fprintf(stderr, "Error the path pointer is NULL!");
-        return (-1);
-    }
+int parse_query_request(char *path, s_query_params *params) {
+    // TODO: Need to extract the query and store the appropriate data necessary
 
-    int question_mark_index = -1;
-    char *city_buffer;
-    city_buffer = (char *)malloc(256 * sizeof(char));
-
+    int question_index = -1;
     for (int i = 0; path[i] != '\0'; i++) {
         if (path[i] == '?') {
-            question_mark_index = i;
+            question_index = i;
             break;
         }
     }
 
-    int buffer_index = 0;
-    for (int j = question_mark_index + 1; j < (int)strlen(path); j++) {
-        city_buffer[j - question_mark_index - 1] = path[j];   
-        buffer_index++;
+    if (question_index == -1) {
+        // Here we don't have the query string and we exit the program then
+        return (0);
     }
 
-    city_buffer[buffer_index] = '\0';
-    
+    // TODO: Need to make a copy of the string because strtok modifies the original string
+    char *query_string = path + question_index + 1;
 
-    int equals_index = -1;
+    char *query_copy = malloc(strlen(query_string) + 1);
+    strcpy(query_copy, query_string);
 
-    for (int i = 0; *city_buffer != '\0'; i++) {
-        if (city_buffer[i] == '=') {
-            equals_index = i;
-            break;
+    char *param = strtok(query_copy, "&");
+
+    while(param != NULL) {
+
+        printf("Found a parameter %s\n", param);
+
+        // TODO: Now we need to split those further down and check if they are city or lon and lat.
+
+        char *equals_pos = strchr(param, '=');
+        if (equals_pos != NULL) {
+            *equals_pos = '\0';
+            char *key = param;
+            char *vlaue = equals_pos + 1;
         }
-    }
-    int city_index = 0;
-    for (int k = equals_index + 1; k < (int) strlen(city_buffer); k++) {
-        city_name[k - equals_index - 1] = city_buffer[k];
-        city_index++;
-    }
-    city_name[city_index] = '\0';
 
-    free(city_buffer);
-    return (0);
+
+
+    }
+
+
+
+
+
 }
 
 e_routing determine_route(const char *path) {
@@ -215,7 +217,7 @@ e_routing determine_route(const char *path) {
 
     if (strcmp(path, "/weather") == 0) {
         return ROUTE_WEATHER;
-    }
+    }   
 
     return ROUTE_NOT_FOUND;
 }

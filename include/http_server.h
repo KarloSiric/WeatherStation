@@ -17,7 +17,6 @@
 #define MAX_BUFFER_SIZE      8192
 
 extern volatile int keep_running;
-
 typedef enum {
     ROUTE_HOME,
     ROUTE_WEATHER,
@@ -25,9 +24,17 @@ typedef enum {
     ROUTE_NOT_FOUND
 } e_routing;
 
+typedef struct {
+    char city[256];
+    char latitude[16];
+    char longitude[16];
+    int has_city;
+    int has_coordinate;
+} s_query_params;
+
 
 int start_http_server(void);
 int parse_http_request(const char *request, char *method, char *path);
-int parse_query_request(char *path, char *city_name);
+int parse_query_request(char *path, s_query_params *params);
 e_routing determine_route(const char *path);
 #endif
