@@ -2,7 +2,7 @@
 * @Author: karlosiric
 * @Date:   2025-06-26 14:39:26
 * @Last Modified by:   karlosiric
-* @Last Modified time: 2025-07-11 12:15:05
+* @Last Modified time: 2025-07-11 13:44:47
 */
 
 
@@ -62,15 +62,18 @@ int start_http_server(void) {
             free(buffer);
             close(client_fd);
             continue;
+        } else {
+            printf("Successfully processed the client's HTTP request, containing %zu bytes of data!\n\n", client_message);
         }
+
         buffer[client_message] = '\0';  
         char *server_response;
         printf("=== Received HTTP Request ===\n%s\n=== End Request ===\n\n", buffer);
         char method[16];
         char path[256];
-        char city_name[256];
+        s_query_params param = {0};
         int parse_result = parse_http_request(buffer, method, path);
-        int query_result = parse_query_request(path, city_name);
+        int query_result = parse_query_request(path, &param);
 
         e_routing routing_type = determine_route(path);
 
@@ -87,9 +90,9 @@ int start_http_server(void) {
             default:
                 server_response = "HTTP/1.0 404 Not Found\r\n\r\n404 - Page Not Found!";
                 break;
-        }
+        }   
         if (query_result == 0) {
-            printf("Parsed city from the URL: '%s'\n", city_name);
+            printf("Parsed city from the URL: '%s'\n", param.city);
         }
 
         bytes_sent = send(client_fd, server_response, strlen(server_response), 0);
@@ -102,7 +105,7 @@ int start_http_server(void) {
             printf("Warning: Only sent %zu out of %zu data bytes\n", bytes_sent, strlen(server_response));
 
         } else {
-            printf("Successfully sent all of the %zu bytes of data!\n\n", bytes_sent);
+            printf("Successfully sent all of the %zu bytes of data back to the Client!\n\n", bytes_sent);
             close(client_fd);
             free(buffer);
         }
@@ -226,7 +229,6 @@ int parse_query_request(char *path, s_query_params *params) {
     if (strlen(params->longitude) > 0 && strlen(params->latitude) > 0) {
         params->has_coordinates = 1;
     }
-
 
     free(query_copy);
     return (0);
