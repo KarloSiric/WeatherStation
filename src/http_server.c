@@ -2,7 +2,7 @@
 * @Author: karlosiric
 * @Date:   2025-06-26 14:39:26
 * @Last Modified by:   karlosiric
-* @Last Modified time: 2025-07-11 12:10:12
+* @Last Modified time: 2025-07-11 12:15:05
 */
 
 
@@ -65,7 +65,7 @@ int start_http_server(void) {
         }
         buffer[client_message] = '\0';  
         char *server_response;
-        printf("=== Received HTTP Request ===\n%s\n=== End Request ===\n", buffer);
+        printf("=== Received HTTP Request ===\n%s\n=== End Request ===\n\n", buffer);
         char method[16];
         char path[256];
         char city_name[256];
@@ -102,7 +102,7 @@ int start_http_server(void) {
             printf("Warning: Only sent %zu out of %zu data bytes\n", bytes_sent, strlen(server_response));
 
         } else {
-            printf("Successfully sent all of the %zu bytes of data!\n", bytes_sent);
+            printf("Successfully sent all of the %zu bytes of data!\n\n", bytes_sent);
             close(client_fd);
             free(buffer);
         }
