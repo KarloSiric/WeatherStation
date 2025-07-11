@@ -2,7 +2,7 @@
 * @Author: karlosiric
 * @Date:   2025-06-26 14:39:26
 * @Last Modified by:   karlosiric
-* @Last Modified time: 2025-07-11 11:35:58
+* @Last Modified time: 2025-07-11 12:10:12
 */
 
 
@@ -193,17 +193,43 @@ int parse_query_request(char *path, s_query_params *params) {
         if (equals_pos != NULL) {
             *equals_pos = '\0';
             char *key = param;
-            char *vlaue = equals_pos + 1;
+            char *value = equals_pos + 1;
+           
+            // DEBUG INFO
+            printf("Key: %s | Value: %s\n", key, value);
+
+            // TODO: Need to now implement checking for each key and value
+            if (strcmp(key, "city") == 0 || strcmp(key, "name") == 0 || strcmp(key, "location") == 0) {
+                // We store that as the city
+                strncpy(params->city, value, sizeof(params->city) - 1);
+                params->city[sizeof(params->city) - 1] = '\0';
+                params->has_city = 1;
+            } 
+            else if (strcmp(key, "lat") == 0 || strcmp(key, "latitude") == 0) {
+                strncpy(params->latitude, value, sizeof(params->latitude) - 1);
+                params->latitude[sizeof(params->latitude) - 1] = '\0';
+
+            }
+            else if (strcmp(key, "lon") == 0 || strcmp(key, "lng") == 0 || strcmp(key, "longitude") == 0) {
+                strncpy(params->longitude, value, sizeof(params->longitude) - 1);
+                params->longitude[sizeof(params->longitude) - 1] = '\0';
+            }
+            else {
+                // Unknown something
+                printf("Unknown parameter: %s=%s\n", key, value);
+            }
         }
 
+        param = strtok(NULL, "&");
+    }
 
-
+    if (strlen(params->longitude) > 0 && strlen(params->latitude) > 0) {
+        params->has_coordinates = 1;
     }
 
 
-
-
-
+    free(query_copy);
+    return (0);
 }
 
 e_routing determine_route(const char *path) {

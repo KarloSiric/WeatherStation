@@ -29,7 +29,7 @@ typedef struct {
     char latitude[16];
     char longitude[16];
     int has_city;
-    int has_coordinate;
+    int has_coordinates;
 } s_query_params;
 
 
