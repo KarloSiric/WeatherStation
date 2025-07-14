@@ -2,11 +2,10 @@
 * @Author: karlosiric
 * @Date:   2025-07-11 15:11:35
 * @Last Modified by:   karlosiric
-* @Last Modified time: 2025-07-14 10:02:28
+* @Last Modified time: 2025-07-14 10:41:00
 */
 
 #include "../include/logger.h"
-#include <cstdlib>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -57,6 +56,7 @@ int logger_init(const char *log_file_path_param) {
 
 void logger_close() {
     if (log_file) {
+        fprintf(log_file, "\n=== LOGGER STOPPED ===\n");
         fclose(log_file);
         log_file = NULL;
     }
@@ -121,5 +121,30 @@ void log_message(e_log_level level, e_log_activity activity, const char *client_
 }
 
 void log_http_request(const char *client_ip, int port, const char *request_line) {
+    if (request_line == NULL) {
+        log_message(LOG_ERROR, LOG_PARSE_ERROR, client_ip, port, LOG_CLIENT_TO_SERVER, "Received NULL request line");
+        return;
+    }
 
+    log_message(LOG_INFO, LOG_REQUEST, client_ip, port, LOG_CLIENT_TO_SERVER, "HTTP Request: %s", request_line);
+}  
+
+void log_http_response(const char *client_ip, int port, const char *response, size_t bytes_sent) {
+    if (response == NULL) {
+        log_message(LOG_ERROR, LOG_RESPONSE, client_ip, port, LOG_SERVER_TO_CLIENT, "Sent NULL response back!");
+        return;
+    }
+
+    log_message(LOG_INFO, LOG_RESPONSE, client_ip, port, LOG_SERVER_TO_CLIENT, "HTTP Request (%zu bytes): %s", bytes_sent, response);
+
+    return;
+}
+
+void log_error(const char *client_ip, int port, const char *error_msg) {
+    if (error_msg == NULL) {
+        log_message(LOG_ERROR, LOG_PARSE_ERROR, client_ip, port, LOG_INTERNAL, "Unknown error occured");
+        return;
+    }
+
+    log_message(LOG_ERROR, LOG_PARSE_ERROR, client_ip, port, LOG_INTERNAL, "Error: %s", error_msg); 
 }
