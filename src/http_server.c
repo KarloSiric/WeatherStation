@@ -2,7 +2,7 @@
 * @Author: karlosiric
 * @Date:   2025-06-26 14:39:26
 * @Last Modified by:   karlosiric
-* @Last Modified time: 2025-07-14 11:23:24
+* @Last Modified time: 2025-07-14 14:47:39
 */
 
 
@@ -12,14 +12,32 @@
 #include <stdio.h>
 #include <string.h>
 
+volatile int keep_running = 1;
+static int server_socket_global = -1;
+
+void signal_handler(int sig) {
+    printf("\nShutting down server ...\n");
+    keep_running = 0;
+
+    if (server_socket_global != -1) {
+        close(server_socket_global);
+    }
+
+    logger_close();
+    exit(0);
+}
+
+
 int start_http_server(void) {
 
-    int socket_fd, bind_result, client_fd;
-    socket_fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (socket_fd == -1) {
+    int bind_result, client_fd;
+    server_socket_global = socket(AF_INET, SOCK_STREAM, 0);
+    if (server_socket_global == -1) {
         printf("Error creating socket: %s\n", strerror(errno));
         return (-1);
     }
+
+    signal(SIGINT, signal_handler);
 
     struct sockaddr_in server_address;
     struct sockaddr_in client_address;
@@ -30,17 +48,17 @@ int start_http_server(void) {
     server_address.sin_port = htons(HTTP_PORT);              // this is to convert the port number to network byte order (Big Endian network byte order).
     server_address.sin_addr.s_addr = INADDR_ANY;             // this is to bind the socket to all available interfaces on the machine.
 
-    bind_result = bind(socket_fd, (struct sockaddr *)&server_address, sizeof(server_address));
+    bind_result = bind(server_socket_global, (struct sockaddr *)&server_address, sizeof(server_address));
 
     if (bind_result == -1) {
         printf("Error binding the socket: %s\n", strerror(errno));
-        close(socket_fd);
+        close(server_socket_global);
         return (-2);
     }
 
-    if (listen(socket_fd, MAX_CONNECTIONS) == -1) {
+    if (listen(server_socket_global, MAX_CONNECTIONS) == -1) {
         printf("Error listening on the socket: %s\n", strerror(errno));
-        close(socket_fd);
+        close(server_socket_global);
         return (-3);
     }
 
@@ -50,10 +68,10 @@ int start_http_server(void) {
     ssize_t bytes_sent;
     char *buffer;
     while(keep_running) {
-        client_fd = accept(socket_fd, (struct sockaddr *)&client_address, &client_addr_len);
+        client_fd = accept(server_socket_global, (struct sockaddr *)&client_address, &client_addr_len);
         if (client_fd == -1) {
             printf("Error accepting connections on the socket: %s\n", strerror(errno));
-            close(socket_fd);
+            close(server_socket_global);
             return (-4);
         }
         buffer = (char *)malloc(MAX_BUFFER_SIZE * sizeof(char));
