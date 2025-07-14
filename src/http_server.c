@@ -2,7 +2,7 @@
 * @Author: karlosiric
 * @Date:   2025-06-26 14:39:26
 * @Last Modified by:   karlosiric
-* @Last Modified time: 2025-07-14 14:47:39
+* @Last Modified time: 2025-07-14 15:28:08
 */
 
 
@@ -31,11 +31,14 @@ void signal_handler(int sig) {
 int start_http_server(void) {
 
     int bind_result, client_fd;
+    int opt = 1;
     server_socket_global = socket(AF_INET, SOCK_STREAM, 0);
     if (server_socket_global == -1) {
         printf("Error creating socket: %s\n", strerror(errno));
         return (-1);
     }
+
+    setsockopt(server_socket_global, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
 
     signal(SIGINT, signal_handler);
 
