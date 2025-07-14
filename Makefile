@@ -30,6 +30,6 @@ test: $(OBJDIR)/weather_api.o
 
 test_http: $(OBJDIR)/http_server.o
 	@mkdir -p bin
-	$(CC) $(CFLAGS) $(SRCDIR)/test_http_server.c $(OBJDIR)/http_server.o -o bin/test_http_server $(LDFLAGS)
+	$(CC) $(CFLAGS) $(SRCDIR)/test_http_server.c $(OBJDIR)/http_server.o $(OBJDIR)/logger.o -o bin/test_http_server $(LDFLAGS)
 
 .PHONY: all clean test

@@ -2,7 +2,7 @@
 * @Author: karlosiric
 * @Date:   2025-07-11 15:11:35
 * @Last Modified by:   karlosiric
-* @Last Modified time: 2025-07-14 10:52:27
+* @Last Modified time: 2025-07-14 11:29:37
 */
 
 #include "../include/logger.h"
@@ -81,7 +81,7 @@ int logger_init(const char *log_file_path_param) {
     return (0);
 }
 
-void logger_close() {
+void logger_close(void) {
     if (log_file) {
         fprintf(log_file, "\n=== LOGGER STOPPED ===\n");
         fclose(log_file);

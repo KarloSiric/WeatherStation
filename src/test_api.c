@@ -2,12 +2,12 @@
 * @Author: karlosiric
 * @Date:   2025-06-27 09:59:48
 * @Last Modified by:   karlosiric
-* @Last Modified time: 2025-06-27 14:56:18
+* @Last Modified time: 2025-07-14 11:26:38
 */
 
 #include "../include/weather.h"
 
-int main(void) {
+int test_api(void) {
 
     printf("Testing Weather API fetching mechanicsm ... \n");
     char *json_response = NULL;

@@ -2,7 +2,7 @@
 * @Author: karlosiric
 * @Date:   2025-06-26 14:39:26
 * @Last Modified by:   karlosiric
-* @Last Modified time: 2025-07-11 15:46:48
+* @Last Modified time: 2025-07-14 11:23:24
 */
 
 
@@ -68,6 +68,9 @@ int start_http_server(void) {
         }
 
         buffer[client_message] = '\0';  
+
+        log_http_request(inet_ntoa(client_address.sin_addr), ntohs(client_address.sin_port), buffer);
+
         char *server_response;
         printf("=== Received HTTP Request ===\n%s\n=== End Request ===\n\n", buffer);
         char method[16];

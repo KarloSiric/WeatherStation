@@ -2,10 +2,11 @@
 * @Author: karlosiric
 * @Date:   2025-06-27 21:40:04
 * @Last Modified by:   karlosiric
-* @Last Modified time: 2025-07-08 12:29:30
+* @Last Modified time: 2025-07-14 11:31:34
 */
 
 #include "../include/http_server.h"
+#include "../include/logger.h"
 #include <signal.h>
 
 volatile int keep_running = 1;
@@ -17,6 +18,13 @@ void signal_handler(int sig) {
 
 int main(void) {
     printf("Starting HTTP Server Test...\n");
+
+    if (logger_init("logs/server.log") != 0) {
+        printf("Warning: Could not initialize the logger\n");
+    }
+    else {
+        printf("Logger initialized successfully!\n");
+    }
     
     // Set up signal handler for Ctrl+C
     signal(SIGINT, signal_handler);
