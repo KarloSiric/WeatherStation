@@ -2,7 +2,7 @@
 * @Author: karlosiric
 * @Date:   2025-07-11 15:11:35
 * @Last Modified by:   karlosiric
-* @Last Modified time: 2025-07-14 11:29:37
+* @Last Modified time: 2025-07-14 12:49:40
 */
 
 #include "../include/logger.h"
@@ -15,6 +15,9 @@
 
 static FILE *log_file = NULL;
 static const char *log_file_path = NULL;
+
+static int session_counter = 0;
+int current_session_id = 0;
 
 static const char *log_level_strings[] = {
     "INFO", "WARNING", "ERROR", "DEBUG"
@@ -31,11 +34,17 @@ static const char *log_direction_string[] = {
 };
 
 int logger_init(const char *log_file_path_param) {
+
+    if (log_file != NULL) {
+        fprintf(stderr, "Logger: Already initialized\n");
+        return (0);
+    }
+
+
     if (log_file_path_param == NULL) {
         fprintf(stderr, "Logger: NULL log file path provided\n");
         return (-1);
     }
-
 
     /* TODO: Need to check if the directory exists and if it doesnt 
      *       Then we need to make one basically, for these we need some inc...
@@ -75,7 +84,10 @@ int logger_init(const char *log_file_path_param) {
         return (-1);
     }
 
-    fprintf(log_file, "\n==== LOGGER STARTED ====\n");
+    session_counter++;
+    current_session_id = session_counter;
+
+    fprintf(log_file, "\n\n==== SERVER SESSION #%d STARTED ====\n\n", current_session_id);
     fflush(log_file);
 
     return (0);
@@ -83,7 +95,7 @@ int logger_init(const char *log_file_path_param) {
 
 void logger_close(void) {
     if (log_file) {
-        fprintf(log_file, "\n=== LOGGER STOPPED ===\n");
+        fprintf(log_file, "\n\n=== SERVER SESSION #%d STOPPED ===\n\n", current_session_id);
         fclose(log_file);
         log_file = NULL;
     }
@@ -100,10 +112,51 @@ void log_message(e_log_level level, e_log_activity activity, const char *client_
         fprintf(stderr, "Logger: Log file is NULL, trying to reopen the logger!\n");
         return;
     }
-    /*
-    // TODO: 1. Need to implement time stamping
-             2. Need to 
+
+    /* TODO: Implementing a safety checkup system:
+     * Checks if the file exists and everything is alright
+     * If it doesnt then it needs to recreated because either the log file
+     * or the log directory is missing and that needs to addressed so...
     */
+
+    if (fprintf(log_file, "") >= 0 && fflush(log_file) != 0) {
+        // If the file handle is broken, we close it and assign it to NULL pointer
+        fclose(log_file);
+        log_file = NULL;
+
+        if (log_file_path != NULL) {
+            log_file = fopen(log_file_path, "a");
+
+            if (log_file != NULL) {
+                // We have hit success that means the file has been recovered
+                fprintf(log_file, "\n\n==== SERVER LOGGER SESION (#%d) RECOVERED (file recreated) ====\n\n", current_session_id);
+                fflush(log_file);
+            } else {
+                char *dir_path = strdup(log_file_path);
+                char *last_slash = strrchr(dir_path, '/');
+                if (last_slash != NULL) {
+                    *last_slash = '\0';
+
+                    mkdir(dir_path, 0755);
+
+                    log_file = fopen(log_file_path, "a");
+                    if (log_file != NULL) {
+                        fprintf(log_file, "\n==== SERVER LOGGER SESSION (#%d) RECOVERED (file and directory recreated) ====\n\n", current_session_id);
+                    }
+                }
+
+                free(dir_path);
+
+                if (log_file == NULL) {
+                    return;           // cannot recover it
+                }
+            }
+        } else {
+            return;
+        }
+
+    }
+
 
 
     if (level < 0 || level >= 4) {

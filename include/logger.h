@@ -29,6 +29,8 @@ typedef enum {
     LOG_INTERNAL
 } e_log_direction;
 
+extern int current_session_id;
+
 int logger_init(const char *log_file_path);
 void logger_close(void);
 void log_message(e_log_level level, e_log_activity activity,
