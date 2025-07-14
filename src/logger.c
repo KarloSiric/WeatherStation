@@ -2,7 +2,7 @@
 * @Author: karlosiric
 * @Date:   2025-07-11 15:11:35
 * @Last Modified by:   karlosiric
-* @Last Modified time: 2025-07-14 13:16:47
+* @Last Modified time: 2025-07-14 14:14:53
 */
 
 #include "../include/logger.h"
@@ -131,15 +131,10 @@ void log_message(e_log_level level, e_log_activity activity, const char *client_
         return;
     }
 
-    int need_recovery = 0;
-    if (log_file_path != NULL) {
-        // Need to check if the 
+    if (log_file == NULL) {
+        fprintf(stderr, "Logger: Still no valid log file after recovery attempt.\n");
+        return;
     }
-
-
-
-
-
 
     if (level < 0 || level >= 4) {
         fprintf(stderr, "Invalid level parameter value, needs to be from (0 - 4)!");
@@ -153,6 +148,72 @@ void log_message(e_log_level level, e_log_activity activity, const char *client_
     if (direction < 0 || direction >= 3) {
         return;
     }
+    int need_recovery = 0;
+    if (log_file == NULL) {
+        fprintf(stderr, "Logger: Log file handle is NULL, attempting recovery...\n");
+        need_recovery = 1;
+    } else if (log_file_path != NULL) {
+        // Now we check if the file still exists on the disk regardless if it maybe exists in memory
+        if (access(log_file_path, F_OK) != 0) {
+            fprintf(stderr, "Logger: Log file was deleted from the disk, attempting recovery ...\n");
+            need_recovery = 1;
+        }
+    }
+
+    /* TODO : Implementing the working recovering process
+     * 
+    */  
+
+    if (need_recovery) {
+        if (log_file_path == NULL) {
+            fprintf(stderr, "Logger: No log file path available, using default 'logs/server.log'\n");
+            log_file_path = strdup("logs/server.log");
+            if (log_file_path == NULL) {
+                fprintf(stderr, "Logger: Failed to allocate memory for the deafult log file path\n");
+                return;
+            }
+        }
+
+        if (log_file != NULL) {
+            fclose(log_file);
+            log_file = NULL;
+        }
+
+        char *dir_path = strdup(log_file_path);
+        if (dir_path != NULL) {
+            char *last_slash = strrchr(dir_path, '/');
+            if (last_slash != NULL) {
+                *last_slash = '\0';
+                mkdir(dir_path, 0755);
+            }
+            free(dir_path);
+        }
+
+
+        // TODO: Now need to recreate the log file HANDLE properly
+        log_file = fopen(log_file_path, "a");
+        if (log_file == NULL) {
+            fprintf(stderr, "Logger: Failed to recreate log file: '%s': %s\n",
+                    log_file_path, strerror(errno));
+            return;
+        }
+
+        // LOG RECOVERY MESSAGE
+        fprintf(log_file, "\n\n==== LOGGER RECOVERED: SESSION #%d ====\n\n", current_session_id);
+        fflush(log_file);
+        fprintf(stderr, "Logger: Successfully recovered log file!\n");
+    }
+
+    /* TODO: Do another double check move just in case 
+     * 
+     *       To be sure everything is working properly for the final time
+    */
+
+    if (log_file == NULL) {
+        fprintf(stderr, "Logger: Still no valid flag file after recovery attempt.\n");
+        return;
+    }
+
 
     time_t now;
     struct tm *timeinfo;
@@ -179,7 +240,9 @@ void log_message(e_log_level level, e_log_activity activity, const char *client_
 
     va_end(args);
 
-    fflush(log_file);
+    if (fflush(log_file) != 0) {
+        fprintf(stderr, "Logger: Warning - Failed to flush log message\n");
+    }
 }
 
 void log_http_request(const char *client_ip, int port, const char *request_line) {
