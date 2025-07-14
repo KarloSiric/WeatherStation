@@ -2,7 +2,7 @@
 * @Author: karlosiric
 * @Date:   2025-07-11 15:11:35
 * @Last Modified by:   karlosiric
-* @Last Modified time: 2025-07-14 10:41:00
+* @Last Modified time: 2025-07-14 10:52:27
 */
 
 #include "../include/logger.h"
@@ -10,6 +10,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 static FILE *log_file = NULL;
 static const char *log_file_path = NULL;
@@ -33,6 +35,31 @@ int logger_init(const char *log_file_path_param) {
         fprintf(stderr, "Logger: NULL log file path provided\n");
         return (-1);
     }
+
+
+    /* TODO: Need to check if the directory exists and if it doesnt 
+     *       Then we need to make one basically, for these we need some inc...
+    */
+    char *dir_path = strdup(log_file_path_param);
+    char *last_slash = strrchr(dir_path, '/');
+    if (last_slash != NULL) {
+        *last_slash = '\0';
+
+        // we then check if the dir exists
+        struct stat st = {0};
+        if (stat(dir_path, &st) == -1) {
+            if (mkdir(dir_path, 0755) == -1) {
+                fprintf(stderr, "Logger: Failed to create directory '%s': %s\n",
+                        dir_path, strerror(errno));
+                free(dir_path);
+                return(-1);
+            }
+            printf("Logger: Created directory '%s'\n", dir_path);
+        }
+
+    }
+    free(dir_path);
+
     log_file_path = strdup(log_file_path_param);
     if (log_file_path == NULL) {
         fprintf(stderr, "Logger: Failed to allocate enough memory for file path\n");
