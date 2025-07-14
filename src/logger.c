@@ -2,7 +2,7 @@
 * @Author: karlosiric
 * @Date:   2025-07-11 15:11:35
 * @Last Modified by:   karlosiric
-* @Last Modified time: 2025-07-14 12:49:40
+* @Last Modified time: 2025-07-14 13:16:47
 */
 
 #include "../include/logger.h"
@@ -12,6 +12,7 @@
 #include <errno.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <unistd.h>
 
 static FILE *log_file = NULL;
 static const char *log_file_path = NULL;
@@ -108,10 +109,6 @@ void logger_close(void) {
 
 
 void log_message(e_log_level level, e_log_activity activity, const char *client_ip, int port, e_log_direction direction, const char *format, ...) {
-    if (log_file == NULL) {
-        fprintf(stderr, "Logger: Log file is NULL, trying to reopen the logger!\n");
-        return;
-    }
 
     /* TODO: Implementing a safety checkup system:
      * Checks if the file exists and everything is alright
@@ -119,43 +116,28 @@ void log_message(e_log_level level, e_log_activity activity, const char *client_
      * or the log directory is missing and that needs to addressed so...
     */
 
-    if (fprintf(log_file, "") >= 0 && fflush(log_file) != 0) {
-        // If the file handle is broken, we close it and assign it to NULL pointer
-        fclose(log_file);
-        log_file = NULL;
-
-        if (log_file_path != NULL) {
-            log_file = fopen(log_file_path, "a");
-
-            if (log_file != NULL) {
-                // We have hit success that means the file has been recovered
-                fprintf(log_file, "\n\n==== SERVER LOGGER SESION (#%d) RECOVERED (file recreated) ====\n\n", current_session_id);
-                fflush(log_file);
-            } else {
-                char *dir_path = strdup(log_file_path);
-                char *last_slash = strrchr(dir_path, '/');
-                if (last_slash != NULL) {
-                    *last_slash = '\0';
-
-                    mkdir(dir_path, 0755);
-
-                    log_file = fopen(log_file_path, "a");
-                    if (log_file != NULL) {
-                        fprintf(log_file, "\n==== SERVER LOGGER SESSION (#%d) RECOVERED (file and directory recreated) ====\n\n", current_session_id);
-                    }
-                }
-
-                free(dir_path);
-
-                if (log_file == NULL) {
-                    return;           // cannot recover it
-                }
-            }
-        } else {
-            return;
-        }
-
+    if (level < 0 || level >= 4) {
+        fprintf(stderr, "Invalid level parameter value, needs to be from (0 to 3)!\n");
+        return;
     }
+
+    if (activity < 0 || activity >= 8) {
+        fprintf(stderr, "Invalid activity parameter value!\n");
+        return;
+    }
+
+    if (direction < 0 || direction >= 3) {
+        fprintf(stderr, "Invalid direction parameter value!\n");
+        return;
+    }
+
+    int need_recovery = 0;
+    if (log_file_path != NULL) {
+        // Need to check if the 
+    }
+
+
+
 
 
 
