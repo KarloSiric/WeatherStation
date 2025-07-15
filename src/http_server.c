@@ -2,13 +2,14 @@
 * @Author: karlosiric
 * @Date:   2025-06-26 14:39:26
 * @Last Modified by:   karlosiric
-* @Last Modified time: 2025-07-14 15:28:08
+* @Last Modified time: 2025-07-15 10:18:27
 */
 
 
 #include "../include/http_server.h"
 #include "../include/logger.h"
 #include <signal.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -272,7 +273,7 @@ e_routing determine_route(const char *path) {
 
     if (strcmp(path, "/weather") == 0) {
         return ROUTE_WEATHER;
-    }   
+    }      
 
     return ROUTE_NOT_FOUND;
 }
